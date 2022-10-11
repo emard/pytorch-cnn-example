@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os
+import os, sys
 import cv2
 import torchvision.models.segmentation
 import torch
@@ -12,7 +12,8 @@ ListModels=os.listdir(SavedModelsFolder)
 #modelPath = "generated/saved_models/760.pth"  # Path to trained model
 modelPath = os.path.join(SavedModelsFolder, ListModels[-1])
 print(modelPath)
-imagePath = "test-gen.jpg"  # Test image generated
+#imagePath = "test-gen.jpg"  # Test image generated
+imagePath = sys.argv[1]  # Test image generated
 resultPath = "test-seg.png" # Result segmented image
 height=width=900 # should match training
 transformImg = tf.Compose([tf.ToPILImage(), tf.Resize((height, width)), tf.ToTensor(),tf.Normalize((0.485, 0.456, 0.406),(0.229, 0.224, 0.225))])  # tf.Resize((300,600)),tf.RandomRotation(145)])#
