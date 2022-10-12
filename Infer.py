@@ -6,7 +6,8 @@ import torch
 import torchvision.transforms as tf
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-SavedModelsFolder = "generated/saved_models"
+#SavedModelsFolder = "generated/saved_models"
+SavedModelsFolder = "mikroskop/saved_models"
 ListModels=os.listdir(SavedModelsFolder)
 # use torch.load with map_location=torch.device('cpu')
 #modelPath = "generated/saved_models/760.pth"  # Path to trained model
@@ -16,7 +17,7 @@ print(modelPath)
 imagePath = sys.argv[1]  # Test image generated
 resultPath = "test-seg.png" # Result segmented image
 height=width=900 # should match training
-transformImg = tf.Compose([tf.ToPILImage(), tf.Resize((height, width)), tf.ToTensor(),tf.Normalize((0.485, 0.456, 0.406),(0.229, 0.224, 0.225))])  # tf.Resize((300,600)),tf.RandomRotation(145)])#
+transformImg = tf.Compose([tf.ToPILImage(), tf.Resize((height, width)), tf.ToTensor(),tf.Normalize((0.35, 0.35, 0.35),(0.18, 0.18, 0.18))])  # tf.Resize((300,600)),tf.RandomRotation(145)])#
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')  # Check if there is GPU if not set trainning to CPU (very slow)
 Net = torchvision.models.segmentation.deeplabv3_resnet50(weights=torchvision.models.segmentation.DeepLabV3_ResNet50_Weights.DEFAULT)  # Load net

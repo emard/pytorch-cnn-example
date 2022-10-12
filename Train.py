@@ -33,10 +33,10 @@ def display2img(color, result):
 # 4 flip rotations to diversify learning
 # tf.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)) -> normalize with mean and stdev for each channel
 # tf.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
-transformImg=(tf.Compose([tf.ToPILImage(),                                        tf.Resize((height,width)),tf.ToTensor(),tf.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))]),
-              tf.Compose([tf.ToPILImage(),tf.functional.hflip,                    tf.Resize((height,width)),tf.ToTensor(),tf.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))]),
-              tf.Compose([tf.ToPILImage(),tf.functional.vflip,                    tf.Resize((height,width)),tf.ToTensor(),tf.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))]),
-              tf.Compose([tf.ToPILImage(),tf.functional.hflip,tf.functional.vflip,tf.Resize((height,width)),tf.ToTensor(),tf.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))]),
+transformImg=(tf.Compose([tf.ToPILImage(),                                        tf.Resize((height,width)),tf.ToTensor(),tf.Normalize((0.35, 0.35, 0.35), (0.18, 0.18, 0.18))]),
+              tf.Compose([tf.ToPILImage(),tf.functional.hflip,                    tf.Resize((height,width)),tf.ToTensor(),tf.Normalize((0.35, 0.35, 0.35), (0.18, 0.18, 0.18))]),
+              tf.Compose([tf.ToPILImage(),tf.functional.vflip,                    tf.Resize((height,width)),tf.ToTensor(),tf.Normalize((0.35, 0.35, 0.35), (0.18, 0.18, 0.18))]),
+              tf.Compose([tf.ToPILImage(),tf.functional.hflip,tf.functional.vflip,tf.Resize((height,width)),tf.ToTensor(),tf.Normalize((0.35, 0.35, 0.35), (0.18, 0.18, 0.18))]),
               )
 transformAnn=(tf.Compose([tf.ToPILImage(),                                        tf.Resize((height,width),tf.InterpolationMode.NEAREST),tf.ToTensor()]),
               tf.Compose([tf.ToPILImage(),tf.functional.hflip,                    tf.Resize((height,width),tf.InterpolationMode.NEAREST),tf.ToTensor()]),
