@@ -29,6 +29,10 @@ height_orgin, width_orgin, d = Img.shape # Get image original size
 #plt.imshow(Img[:,:,::-1])  # Show image
 #plt.show()
 Img = transformImg(Img)  # Transform to pytorch
+mean, std = Img.mean([1,2]), Img.std([1,2])
+print("mean (ideal = 0,0,0) : ", mean);
+print("std  (ideal = 1,1,1) : ", std);
+
 Img = torch.autograd.Variable(Img, requires_grad=False).to(device).unsqueeze(0)
 with torch.no_grad():
     Prd = Net(Img)['out']  # Run net
