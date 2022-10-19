@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # todo:
-# [ ] enter list of color images as path/file.jpg or path/file.png files
+# [x] enter list of color images as path/file.jpg or path/file.png files
 #     each file will be segmented to grayscale path/file_seg.png file
 # [ ] cmdline option to specify model .pth file
 
