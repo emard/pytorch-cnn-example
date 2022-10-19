@@ -5,14 +5,16 @@
 # <policy domain="resource" name="disk" value="8GiB"/>
 
 path=/tmp/airvoid
+#ext=.png
+ext=_seg.png
 
-for first_tile in ${path}/tile_1??_100.png
+for first_tile in ${path}/tile_1??_100${ext}
 do
   d=$(dirname $first_tile)
-  f=$(basename -s _100.png $first_tile)
+  f=$(basename -s _100${ext} $first_tile)
   echo ${d}/${f}
-  convert ${d}/${f}_1??.png +append ${d}/${f}.png
-  rm ${d}/${f}_1??.png
+  convert ${d}/${f}_1??${ext} +append ${d}/${f}${ext}
+  rm ${d}/${f}_1??${ext}
 done
-convert ${path}/tile_1??.png -append ${path}/full.png
-rm ${path}/tile_1??.png
+convert ${path}/tile_1??${ext} -append ${path}/full${ext}
+rm ${path}/tile_1??${ext}
