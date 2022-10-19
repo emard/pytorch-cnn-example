@@ -12,8 +12,7 @@ import torch
 import torchvision.transforms as tf
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-#SavedModelsFolder = "generated/saved_models"
-SavedModelsFolder = "mikroskop/saved_models"
+SavedModelsFolder = "generated/saved_models"
 ListModels=os.listdir(SavedModelsFolder)
 # use torch.load with map_location=torch.device('cpu')
 #modelPath = "generated/saved_models/760.pth"  # Path to trained model
