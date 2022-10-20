@@ -33,6 +33,8 @@ def display2img(color, result):
 # 4 flip rotations to diversify learning
 # tf.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)) -> normalize with mean and stdev for each channel
 # tf.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+# with random crop_x crop_y, tf.Resize is not needed
+# if sizes of all images are larger or equal than width,height
 transformImg=(tf.Compose([tf.ToPILImage(),                                        tf.Resize((height,width)),tf.ToTensor(),tf.Normalize((0.35, 0.35, 0.35), (0.18, 0.18, 0.18))]),
               tf.Compose([tf.ToPILImage(),tf.functional.hflip,                    tf.Resize((height,width)),tf.ToTensor(),tf.Normalize((0.35, 0.35, 0.35), (0.18, 0.18, 0.18))]),
               tf.Compose([tf.ToPILImage(),tf.functional.vflip,                    tf.Resize((height,width)),tf.ToTensor(),tf.Normalize((0.35, 0.35, 0.35), (0.18, 0.18, 0.18))]),
@@ -48,8 +50,20 @@ transformAnn=(tf.Compose([tf.ToPILImage(),                                      
 def ReadRandomImage(): # load random image and the corresponding annotation
     idx=np.random.randint(0,len(ListImages)) # Select random image
     Img=cv2.imread(os.path.join(TrainFolder, "Image", ListImages[idx]))[:,:,0:3]
-    type1 = cv2.imread(os.path.join(TrainFolder, "Semantic/1", ListImages[idx].replace("jpg","png")),cv2.IMREAD_GRAYSCALE)
-    type2 = cv2.imread(os.path.join(TrainFolder, "Semantic/2", ListImages[idx].replace("jpg","png")),cv2.IMREAD_GRAYSCALE)
+    image_height, image_width, image_channels = Img.shape
+    crop_x = crop_y = 0
+    if image_width > width and image_height > height:
+      # random crop origin
+      crop_x = np.random.randint(0, image_width  - width)
+      crop_y = np.random.randint(0, image_height - height)
+    if crop_x > 0 or crop_y > 0:
+      Img    = Img[crop_y:crop_y+height, crop_x:crop_x+width]
+    type1  = cv2.imread(os.path.join(TrainFolder, "Semantic/1", ListImages[idx].replace("jpg","png")),cv2.IMREAD_GRAYSCALE)
+    if crop_x > 0 or crop_y > 0:
+      type1  = type1[crop_y:crop_y+height, crop_x:crop_x+width]
+    type2  = cv2.imread(os.path.join(TrainFolder, "Semantic/2", ListImages[idx].replace("jpg","png")),cv2.IMREAD_GRAYSCALE)
+    if crop_x > 0 or crop_y > 0:
+      type2  = type2[crop_y:crop_y+height, crop_x:crop_x+width]
     AnnMap = np.zeros(Img.shape[0:2],np.float32)
     if type2 is not None: AnnMap[ type2 > 60 ] = 2 # "void"
     if type1 is not None: AnnMap[ type1 > 60 ] = 1 # "stone", overwrites void
