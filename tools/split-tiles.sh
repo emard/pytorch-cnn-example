@@ -24,7 +24,7 @@ crop_size=$(identify -format "%[fx:(w - w % ${tile_x})]x%[fx:(h - h % ${tile_y})
 convert $1 +repage \
 -gravity center -crop ${crop_size}+0+0 +gravity +repage \
 -crop ${tile_x}x${tile_y} \
--set filename:row "%[fx:page.y/${tile_x}+100]" \
--set filename:col "%[fx:page.x/${tile_y}+100]" \
+-set filename:col "%[fx:page.x/${tile_x}+100]" \
+-set filename:row "%[fx:page.y/${tile_y}+100]" \
 +repage \
  "${path}/tile_%[filename:row]_%[filename:col].png"
