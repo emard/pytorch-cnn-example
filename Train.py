@@ -11,7 +11,7 @@ import matplotlib.image as mpimg
 Learning_Rate=1e-5
 width=height=900 # image width and height
 batchSize=4
-save_every=50
+save_every=200
 
 TrainFolder="generated"
 
@@ -49,13 +49,16 @@ transformAnn=(tf.Compose([tf.ToPILImage(),                                      
 #---------------------Read image ---------------------------------------------------------
 def ReadRandomImage(): # load random image and the corresponding annotation
     idx=np.random.randint(0,len(ListImages)) # Select random image
+    #print(ListImages[idx])
     Img=cv2.imread(os.path.join(TrainFolder, "Image", ListImages[idx]))[:,:,0:3]
     image_height, image_width, image_channels = Img.shape
+    #print(image_width, image_height)
     crop_x = crop_y = 0
-    if image_width > width and image_height > height:
-      # random crop origin
+    if image_width > width:
       crop_x = np.random.randint(0, image_width  - width)
+    if image_height > height:
       crop_y = np.random.randint(0, image_height - height)
+    #print(crop_x, crop_y)
     if crop_x > 0 or crop_y > 0:
       Img    = Img[crop_y:crop_y+height, crop_x:crop_x+width]
     type1  = cv2.imread(os.path.join(TrainFolder, "Semantic/1", ListImages[idx].replace("jpg","png")),cv2.IMREAD_GRAYSCALE)
@@ -96,7 +99,7 @@ if(ListSaved):
    itr = int(re.sub('[^\d]', '', ListSaved[-1]))
    print("Resume iteration", itr)
 #----------------Train--------------------------------------------------------------------------
-while itr <= 20000: # Training loop
+while itr*batchSize <= 40000: # Training loop
    images,ann=LoadBatch() # Load taining batch
    images=torch.autograd.Variable(images,requires_grad=False).to(device) # Load image
    ann = torch.autograd.Variable(ann, requires_grad=False).to(device) # Load annotation
@@ -108,10 +111,10 @@ while itr <= 20000: # Training loop
    optimizer.step() # Apply gradient descent change to weight
    seg = torch.argmax(Pred[0], 0).cpu().detach().numpy()  # Get  prediction classes
    print("Iteration=",itr," Loss=",Loss.data.cpu().numpy())
-   if itr % save_every == 0: # Save model weight once every 1k steps to file
+   if itr % (save_every//batchSize) == 0: # Save model weight once every 1k steps to file
         # delete old saved
-        if itr >= save_every:
-          file_to_remove = os.path.join(SavedModelFolder, str(itr-save_every) + ".pth")
+        if itr >= (save_every//batchSize):
+          file_to_remove = os.path.join(SavedModelFolder, str(itr-save_every//batchSize) + ".pth")
           if os.path.exists(file_to_remove):
             os.remove(file_to_remove)
         torch.save(Net.state_dict(), os.path.join(SavedModelFolder, str(itr) + ".pth"))
