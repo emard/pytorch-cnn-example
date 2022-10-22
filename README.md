@@ -117,11 +117,20 @@ could be used.
 Given one "image.png" or "image.jpg" as paramter "Infer.py" script will
 apply trained coefficients, write segmented grayscale image "image_seg.png"
 (black, gray, white) and display on screen source image and segmented one.
+
+     ./Infer.py input.jpg
+
 If 2 more image files as arguments are passed, script will batch-process all
 of them and won't display any.
 
+     ./Infer.py tile*.png
+
 To properly segment large image, it should be split to 900x900 tiles,
 each tile segmented and results joined back into one large image.
+Script "split-tiles.sh" center-splits large image to tiles of
+900x900 pixels each, leaving out the edges of the image that
+wouldn't make full 900x900 tiles.
+
 There are scripts to do this:
 
      tools/split-tiles.sh image.jpg
@@ -134,9 +143,17 @@ of this image, it should normally have same scale as input "image.png",
 scale and all other metadata can be printed with:
 
      identify -verbose image.jpg
+     ... long multiline report ...
 
-Script "split-tiles.sh" center-splits to tiles of 900x900 size, leaving
-out the edges of the image that doesn't make full tiles.
+or
+
+     identify -format "%xx%y %U" image.jpg
+     1889.7599999999999909x1889.7599999999999909 PixelsPerCentimeter
+
+And then appled to final image. Imagemagick will recompress image.
+.png keeps exact pixel data, .jpg loses a bit of pixel details:
+
+     mogrify -density 4800 -units PixelsPerInch /tmp/full_seg.png
 
 # Original source
 
