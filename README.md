@@ -109,7 +109,34 @@ from saved file.
 
 # Infer
 
-To apply trained file to semantic segment 
+To apply trained file for semantic segmentation of some image,
+at least one color image of approx 900x900 should be prepared.
+Tool internally resizes the input image so some smaller or larger
+could be used.
+
+Given one "image.png" or "image.jpg" as paramter "Infer.py" script will
+apply trained coefficients, write segmented grayscale image "image_seg.png"
+(black, gray, white) and display on screen source image and segmented one.
+If 2 more image files as arguments are passed, script will batch-process all
+of them and won't display any.
+
+To properly segment large image, it should be split to 900x900 tiles,
+each tile segmented and results joined back into one large image.
+There are scripts to do this:
+
+     tools/split-tiles.sh image.jpg
+     ./Infer.py /tmp/airvoid/tile*.png
+     tools/join-tiles.sh
+     tools/set-scale.sh /tmp/full_seg.png
+
+Result will be in "/tmp/full_seg.png", and final script sets real scale
+of this image, it should normally have same scale as input "image.png",
+scale and all other metadata can be printed with:
+
+     identify -verbose image.jpg
+
+Script "split-tiles.sh" center-splits to tiles of 900x900 size, leaving
+out the edges of the image that doesn't make full tiles.
 
 # Original source
 
