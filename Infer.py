@@ -23,7 +23,9 @@ height=width=900 # should match training
 transformImg = tf.Compose([tf.ToPILImage(), tf.Resize((height, width)), tf.ToTensor(),tf.Normalize((0.35, 0.35, 0.35),(0.18, 0.18, 0.18))])  # tf.Resize((300,600)),tf.RandomRotation(145)])#
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')  # Check if there is GPU if not set trainning to CPU (very slow)
+#Net = torchvision.models.segmentation.deeplabv3_mobilenet_v3_large()
 Net = torchvision.models.segmentation.deeplabv3_resnet50(weights=torchvision.models.segmentation.DeepLabV3_ResNet50_Weights.DEFAULT)  # Load net
+#Net = torchvision.models.segmentation.deeplabv3_resnet101()
 Net.classifier[4] = torch.nn.Conv2d(256, 3, kernel_size=(1, 1), stride=(1, 1))  # Change final layer to 3 classes
 Net = Net.to(device)  # Set net to GPU or CPU
 Net.load_state_dict(torch.load(modelPath,map_location=torch.device(device))) # Load trained model
