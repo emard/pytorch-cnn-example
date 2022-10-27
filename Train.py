@@ -52,21 +52,30 @@ def ReadRandomImage(): # load random image and the corresponding annotation
     #print(ListImages[idx])
     Img=cv2.imread(os.path.join(TrainFolder, "Image", ListImages[idx]))[:,:,0:3]
     image_height, image_width, image_channels = Img.shape
+    # randomize wanted crop size between width/2 and width*2
+    min_random=width//2
+    max_random=width*2
+    # clamp max_random to available image size
+    if max_random > image_width:
+      max_random = image_width
+    if max_random > image_height:
+      max_random = image_height
+    random_width = random_height = np.random.randint(min_random,max_random)
     #print(image_width, image_height)
     crop_x = crop_y = 0
-    if image_width > width:
-      crop_x = np.random.randint(0, image_width  - width)
-    if image_height > height:
-      crop_y = np.random.randint(0, image_height - height)
-    #print(crop_x, crop_y)
+    if image_width > random_width:
+      crop_x = np.random.randint(0, image_width  - random_width)
+    if image_height > random_height:
+      crop_y = np.random.randint(0, image_height - random_height)
+    #print(crop_x, crop_y, )
     if crop_x > 0 or crop_y > 0:
-      Img    = Img[crop_y:crop_y+height, crop_x:crop_x+width]
+      Img    = Img[crop_y:crop_y+random_height, crop_x:crop_x+random_width]
     type1  = cv2.imread(os.path.join(TrainFolder, "Semantic/1", ListImages[idx].replace("jpg","png")),cv2.IMREAD_GRAYSCALE)
     if crop_x > 0 or crop_y > 0:
-      type1  = type1[crop_y:crop_y+height, crop_x:crop_x+width]
+      type1  = type1[crop_y:crop_y+random_height, crop_x:crop_x+random_width]
     type2  = cv2.imread(os.path.join(TrainFolder, "Semantic/2", ListImages[idx].replace("jpg","png")),cv2.IMREAD_GRAYSCALE)
     if crop_x > 0 or crop_y > 0:
-      type2  = type2[crop_y:crop_y+height, crop_x:crop_x+width]
+      type2  = type2[crop_y:crop_y+random_height, crop_x:crop_x+random_width]
     AnnMap = np.zeros(Img.shape[0:2],np.float32)
     if type2 is not None: AnnMap[ type2 > 60 ] = 2 # "void"
     if type1 is not None: AnnMap[ type1 > 60 ] = 1 # "stone", overwrites void
