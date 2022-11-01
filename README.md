@@ -20,19 +20,19 @@ and disk usage. edit "/etc/ImageMagick-6/policy.xml"
 Use script "tools/split-image.sh bigimage.jpg". Split tiles will be in
 "/tmp/airvoid" directory.
 
-Choos tile of interested and open it with gimp. Create 3 additional layers:
-"black", "green", "red". "green" and "red" create filled with transparent
-background, "black" with black (non-transparent) background. Black is
-required, if black layer is missing, pixels erased with "rubber" tools
-will look transparent (inivisible) but still will be exported (confusing
-and not wanted feature here).
+Choose tile of interested and open it with gimp. Create 3 additional layers:
+"black", "red", "green". Create "red" and "green" filled with transparent
+background, "black" filled with non-transparent black (background). Black is
+required. If black layer is missing, otherwise a "bug" will appear.
+Pixels erased with "rubber" tools will look transparent (invisible) to user
+but they will be exported as gray instead of black.
 
 Layers should be ordered like this:
 
     enable  color  name     background
     ------  -----  ----     ----------
-    [x]     red    2_void   transparent
     [x]     green  1_stone  transparent
+    [x]     red    2_void   transparent
     [x]            image to be annotated
     [x]     black  0        black
 
@@ -46,8 +46,8 @@ When finished, select "green" and "black"
 
     enable  color  name     background
     ------  -----  ----     ----------
-    [ ]     red    2_void   transparent
     [x]     green  1_stone  transparent
+    [ ]     red    2_void   transparent
     [ ]            image to be annotated
     [x]     black  0        black
 
@@ -58,8 +58,8 @@ Similar select "red" and "black"
 
     enable  color  name     background
     ------  -----  ----     ----------
-    [x]     red    2_void   transparent
     [ ]     green  1_stone  transparent
+    [x]     red    2_void   transparent
     [ ]            image to be annotated
     [x]     black  0        black
 
@@ -75,8 +75,8 @@ Original image should be copied or similarly selected and exported
 
     enable  color  name     background
     ------  -----  ----     ----------
-    [ ]     red    2_void   transparent
     [ ]     green  1_stone  transparent
+    [ ]     red    2_void   transparent
     [x]            image to be annotated
     [x]     black  0        black
 
