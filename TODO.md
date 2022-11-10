@@ -3,3 +3,5 @@
         convert in.png -threshold 20% out.png # 1-bit mono
         convert in.png -colorspace gray +matte -colors 2 -depth 1 out.png # 1-bit mono
     [ ] convert script to export layers from .xcf to .png files
+    [ ] progress report on large image
+    [ ] every 1-2 minutes save unfinished output to track progress
