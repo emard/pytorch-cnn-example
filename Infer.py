@@ -7,12 +7,14 @@
 
 import os, sys
 from PIL import Image, ImageOps
+import cv2
 import torch
 import torchvision.models.segmentation
 import torchvision.transforms as tf
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy
+import time
 
 # allow to load large images
 Image.MAX_IMAGE_PIXELS = None
@@ -25,7 +27,8 @@ modelPath = os.path.join(SavedModelsFolder, ListModels[-1]) # latest model
 print("trained model:", modelPath)
 
 height=width=900 # should match training
-transformImg = tf.Compose([tf.Resize((height, width)), tf.ToTensor(),tf.Normalize((0.35, 0.35, 0.35),(0.18, 0.18, 0.18))])  # tf.Resize((300,600)),tf.RandomRotation(145)])#
+#transformImg = tf.Compose([tf.Resize((height, width)),tf.ToTensor(),tf.Normalize((0.35, 0.35, 0.35),(0.18, 0.18, 0.18))])
+transformImg = tf.Compose([tf.ToTensor(),tf.Normalize((0.35, 0.35, 0.35),(0.18, 0.18, 0.18))])
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')  # Check if there is GPU if not set trainning to CPU (very slow)
 #Net = torchvision.models.segmentation.deeplabv3_mobilenet_v3_large()
@@ -37,9 +40,10 @@ Net.load_state_dict(torch.load(modelPath,map_location=torch.device(device))) # L
 Net.eval() # Set to evaluation mode
 
 def semantic_segmentation(in_file, out_file):
+  save_event = time.time()
   in_img = Image.open(in_file)
   out_img=Image.new(mode='L', size=in_img.size)   # mode='L' creates 8-bit grayscale image
-  height_orgin, width_orgin = in_img.size
+  width_orgin, height_orgin = in_img.size
   torch2pil = tf.ToPILImage()
   # recolor converts indexes 0,1,2 to 8-bit grayscales [0,1,2] -> [0,127,255]
   recolor = numpy.array([0,127,255], dtype=numpy.uint8)
@@ -62,17 +66,23 @@ def semantic_segmentation(in_file, out_file):
       # semantic segmentation of the tile
       Img = transformImg(tile)
       mean, std = Img.mean([1,2]), Img.std([1,2])
-      # print statistics, if most images deviates too much,
+      # print statistics, if most images deviate too much,
       # change tf.Normalize. They must be same here in Infer.py and in Train.py
       print("mean (ideal = 0,0,0) : ", mean);
       print("std  (ideal = 1,1,1) : ", std);
       Img = torch.autograd.Variable(Img, requires_grad=False).to(device).unsqueeze(0)
       with torch.no_grad():
         Prd = Net(Img)['out']  # Run net
-      Prd = tf.Resize((height_orgin, width_orgin))(Prd[0]) # Resize to origninal size
-      seg = torch.argmax(Prd, 0).cpu().detach().numpy().astype(numpy.uint8)  # Get prediction classes
+      # Prd = tf.Resize((height_orgin, width_orgin))(Prd[0]) # Resize to origninal size
+      Prd = Prd[0] # don't resize, just take out the basic result
+      seg = torch.argmax(Prd, 0).cpu().detach().numpy().astype(numpy.uint8) # Get prediction classes
       # color convert and paste result tile to same origin in out_img
       out_img.paste(torch2pil(recolor[seg]), (x,y)) # (x,y) is origin coordinate to paste at
+      # save partial result every minute
+      if time.time() > save_event:
+        save_event = time.time() + 60
+        out_img.save(out_file)
+        print("saved", out_file)
       x += width
     y += height
 
