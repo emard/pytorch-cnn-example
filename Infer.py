@@ -39,11 +39,26 @@ Net = Net.to(device)  # Set net to GPU or CPU
 Net.load_state_dict(torch.load(modelPath,map_location=torch.device(device))) # Load trained model
 Net.eval() # Set to evaluation mode
 
+def read_dpi(pilimg):
+  if "dpi" in pilimg.info:
+    return pilimg.info["dpi"]
+  if "jfif_density" in pilimg.info:
+    density = pilimg.info["jfif_density"]
+    unit_m = (25.4e-3, 25.4e-3)
+    if "jfif_unit" in pilimg.info:
+      if pilimg.info["jfif_unit"] == 3:
+        unit_m = (10.0e-3, 10.0e-3)
+    return (density[0]*25.4e-3/unit_m[0], density[1]*25.4e-3/unit_m[1])
+  return (2400,2400)
+
 def semantic_segmentation(in_file, out_file):
   save_event = time.time()
   in_img = Image.open(in_file)
   out_img=Image.new(mode='L', size=in_img.size)   # mode='L' creates 8-bit grayscale image
   width_orgin, height_orgin = in_img.size
+  print("info", in_img.info)
+  in_dpi = read_dpi(in_img)
+  print("dpi:", in_dpi)
   torch2pil = tf.ToPILImage()
   # recolor converts indexes 0,1,2 to 8-bit grayscales [0,1,2] -> [0,127,255]
   recolor = numpy.array([0,127,255], dtype=numpy.uint8)
@@ -81,13 +96,13 @@ def semantic_segmentation(in_file, out_file):
       # save partial result every minute
       if time.time() > save_event:
         save_event = time.time() + 60
-        out_img.save(out_file)
+        out_img.save(out_file, dpi=in_dpi)
         print("saved", out_file)
       x += width
     y += height
 
   # save final image to file
-  out_img.save(out_file)
+  out_img.save(out_file, dpi=in_dpi)
 
 # display 2 images side-by-side
 def display2img(path1, path2):
