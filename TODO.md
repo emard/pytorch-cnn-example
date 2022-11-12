@@ -4,4 +4,8 @@
         convert in.png -colorspace gray +matte -colors 2 -depth 1 out.png # 1-bit mono
     [ ] convert script to export layers from .xcf to .png files
     [ ] progress report on large image
-    [ ] every 1-2 minutes save unfinished output to track progress
+    [x] every 1-2 minutes save unfinished output to track progress
+    [ ] margin few pixels tile overlap to avoid boundary conditions
+    [ ] improve code to erase previous file
+        (save filename instead of calculating previous iteration)
+    [ ] separate random filp transform
