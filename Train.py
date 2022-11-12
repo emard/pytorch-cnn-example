@@ -121,7 +121,7 @@ while itr*batchSize <= 40000: # Training loop
    Loss.backward() # Backpropogate loss
    optimizer.step() # Apply gradient descent change to weight
    seg = torch.argmax(Pred[0], 0).cpu().detach().numpy()  # Get  prediction classes
-   print("Iteration=",itr," Loss=",Loss.data.cpu().numpy())
+   print("Iteration=%5d" % itr, " Loss=%3.0f%%" % (Loss.data.cpu().numpy() * 100))
    if itr % (save_every//batchSize) == 0: # Save model weight once every 1k steps to file
         # delete old saved
         if itr >= (save_every//batchSize):
