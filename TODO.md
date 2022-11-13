@@ -6,6 +6,5 @@
     [ ] progress report on large image
     [x] every 1-2 minutes save unfinished output to track progress
     [ ] margin few pixels tile overlap to avoid boundary conditions
-    [ ] improve code to erase previous file
-        (save filename instead of calculating previous iteration)
+    [x] improve code to erase previous file
     [ ] separate random filp transform
