@@ -2,14 +2,15 @@
 import os, re
 import numpy as np
 import cv2
-import torchvision.models.segmentation
 import torch
+import time
+import torchvision.models.segmentation
 import torchvision.transforms as tf
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
 Learning_Rate=1e-5
-width=height=900 # image width and height
+width=height=900 # image width and height, minimum 224 pixels
 batchSize=4
 save_every=200
 
@@ -103,13 +104,17 @@ optimizer=torch.optim.Adam(params=Net.parameters(),lr=Learning_Rate) # Create ad
 #---------------- Load save state --------------------------------------------------------------
 ListSaved=os.listdir(SavedModelFolder) # Create list of saved models
 print(ListSaved)
+saved_filename = ""
+if ListSaved:
+  saved_filename = ListSaved[-1]
 itr = 0
-if(ListSaved):
-   Net.load_state_dict(torch.load(os.path.join(SavedModelFolder, ListSaved[-1]), map_location=device))  
-   print("Loaded Model " + ListSaved[-1])
-   itr = int(re.sub('[^\d]', '', ListSaved[-1]))
+if saved_filename != "":
+   Net.load_state_dict(torch.load(os.path.join(SavedModelFolder, saved_filename), map_location=device))
+   print("Loaded Model", saved_filename)
+   itr = int(re.sub('[^\d]', '', saved_filename))
    print("Resume iteration", itr)
 #----------------Train--------------------------------------------------------------------------
+save_event = time.time()
 while itr*batchSize <= 40000: # Training loop
    images,ann=LoadBatch() # Load taining batch
    images=torch.autograd.Variable(images,requires_grad=False).to(device) # Load image
@@ -122,13 +127,14 @@ while itr*batchSize <= 40000: # Training loop
    optimizer.step() # Apply gradient descent change to weight
    seg = torch.argmax(Pred[0], 0).cpu().detach().numpy()  # Get  prediction classes
    print("Iteration=%5d" % itr, " Loss=%3.0f%%" % (Loss.data.cpu().numpy() * 100))
-   if itr % (save_every//batchSize) == 0: # Save model weight once every 1k steps to file
+   if time.time() > save_event:
+        save_event = time.time() + 60
         # delete old saved
-        if itr >= (save_every//batchSize):
-          file_to_remove = os.path.join(SavedModelFolder, str(itr-save_every//batchSize) + ".pth")
+        if saved_filename != "":
+          file_to_remove = os.path.join(SavedModelFolder, saved_filename)
           if os.path.exists(file_to_remove):
             os.remove(file_to_remove)
-        torch.save(Net.state_dict(), os.path.join(SavedModelFolder, str(itr) + ".pth"))
-        print("Saved Model " + str(itr) + ".pth")
+        saved_filename = str(itr) + ".pth"
+        torch.save(Net.state_dict(), os.path.join(SavedModelFolder, saved_filename))
+        print("Saved Model", saved_filename)
    itr += 1
- 
