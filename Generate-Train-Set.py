@@ -44,9 +44,34 @@ from PIL import Image # PIL required only to write image with DPI metadata
 
 def circles(xpos,ypos,d,color):
   global image
+  h,w,colors = image.shape
   n = xpos.size
   for i in range(xpos.size):
+    # shave off 4 pixels at NWSE circle edges
+    # this reads 4 single pixels for later undo
+    # without those pixels circle is more "smooth"
+    # those pixels affect histogram which shows peak at small diameter
+    # this is kind of "bugfix" for cv2.circle()
+    d0=d[i]
+    if ypos[i] >= d0:
+      (bn,gn,rn) = image[ypos[i]-d0,xpos[i]]
+    if ypos[i] < h-d0:
+      (bs,gs,rs) = image[ypos[i]+d0,xpos[i]]
+    if xpos[i] >= d0:
+      (bw,gw,rw) = image[ypos[i],xpos[i]-d0]
+    if xpos[i] < w-d0:
+      (be,ge,re) = image[ypos[i],xpos[i]+d0]
     image = cv2.circle(image,(xpos[i],ypos[i]), d[i], color,cv2.FILLED)
+    # this undoes 4 abovementioned pixels
+    # effective shaving off circle to be more "round"
+    if ypos[i] >= d0:
+      image[ypos[i]-d0,xpos[i]] = (bn,gn,rn)
+    if ypos[i] < h-d0:
+      image[ypos[i]+d0,xpos[i]] = (bs,gs,rs)
+    if xpos[i] >= d0:
+      image[ypos[i],xpos[i]-d0] = (bw,gw,rw)
+    if xpos[i] < w-d0:
+      image[ypos[i],xpos[i]+d0] = (be,ge,re)
 
 black=(0,0,0)
 gray=(127,127,127)
