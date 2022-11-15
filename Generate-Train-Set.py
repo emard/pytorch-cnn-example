@@ -31,6 +31,8 @@ if 1:
   # poisson distribution
   void_lambda=5
   void_size=2
+  # check histogram hole between 9 and 10 void size (use np.full())
+  #void_size=9
 
   stone_count=200
   # poisson distribution
@@ -92,6 +94,7 @@ def generate(i):
   xpvoid=np.random.randint(width, size=void_count)
   ypvoid=np.random.randint(height, size=void_count)
   rvoid=np.random.poisson(void_lambda, size=void_count)*void_size
+  #rvoid=np.full(void_count, void_size)
 
   # generate color image with everything
   image = np.zeros((height,width,3), np.uint8)
