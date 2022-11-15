@@ -2,6 +2,7 @@
 
 mkdir -p generated/saved_models
 mkdir -p generated/Image
+mkdir -p generated/Segmented
 mkdir -p generated/Semantic/1_stone
 mkdir -p generated/Semantic/2_void
 ln -sf generated/Image/image000.jpg test-gen.jpg
