@@ -93,6 +93,18 @@ def LoadBatch(): # Load batch of images
     for i in range(batchSize):
         images[i],ann[i]=ReadRandomImage()
     return images, ann
+#------------- save .pth file (trained model) -------------------
+def save_trained_model(itr):
+  global saved_filename
+  # delete old saved
+  if saved_filename != "":
+    file_to_remove = os.path.join(SavedModelFolder, saved_filename)
+    if os.path.exists(file_to_remove):
+      os.remove(file_to_remove)
+  saved_filename = str(itr) + ".pth"
+  torch.save(Net.state_dict(), os.path.join(SavedModelFolder, saved_filename))
+  print("Saved Model", saved_filename)
+
 #--------------Load and set net and optimizer-------------------------------------
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 #Net = torchvision.models.segmentation.deeplabv3_mobilenet_v3_large()
@@ -115,7 +127,7 @@ if saved_filename != "":
    print("Resume iteration", itr)
 #----------------Train--------------------------------------------------------------------------
 save_event = time.time()
-while itr*batchSize <= 40000: # Training loop
+while itr*batchSize < 40000: # Training loop
    images,ann=LoadBatch() # Load taining batch
    images=torch.autograd.Variable(images,requires_grad=False).to(device) # Load image
    ann = torch.autograd.Variable(ann, requires_grad=False).to(device) # Load annotation
@@ -128,13 +140,7 @@ while itr*batchSize <= 40000: # Training loop
    seg = torch.argmax(Pred[0], 0).cpu().detach().numpy()  # Get  prediction classes
    print("Iteration=%5d" % itr, " Loss=%3.0f%%" % (Loss.data.cpu().numpy() * 100))
    if time.time() > save_event:
-        save_event = time.time() + 60
-        # delete old saved
-        if saved_filename != "":
-          file_to_remove = os.path.join(SavedModelFolder, saved_filename)
-          if os.path.exists(file_to_remove):
-            os.remove(file_to_remove)
-        saved_filename = str(itr) + ".pth"
-        torch.save(Net.state_dict(), os.path.join(SavedModelFolder, saved_filename))
-        print("Saved Model", saved_filename)
+      save_event = time.time() + 60
+      save_trained_model(itr)
    itr += 1
+save_trained_model(itr)
