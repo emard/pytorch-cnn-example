@@ -16,6 +16,10 @@ import torchvision.models.segmentation
 import torchvision.transforms as tf
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+
+# allow to load large images
+Image.MAX_IMAGE_PIXELS = None
+
 SavedModelsFolder = "generated/saved_models"
 ListModels=os.listdir(SavedModelsFolder)
 # use torch.load with map_location=torch.device('cpu')
