@@ -3,24 +3,24 @@
 # how many images to create
 count=1
 
-if 0:
+if 1:
   # dimensions of generated images FULL HD
   width=1920
   height=1080
   dpi=100
 
   # how many voids and stones per image
-  void_count=5000
+  void_count=500
   # poisson distribution
   void_lambda=5
-  void_size=1
+  void_size=3
 
   stone_count=200
   # poisson distribution
   stone_lambda=5
   stone_size=6
 
-if 1:
+if 0:
   # dimensions of generated images 100x142 mm @ 2400 DPI
   width=9448
   height=13417
@@ -78,7 +78,7 @@ def circles(xpos,ypos,d,color):
 black=(0,0,0)
 gray=(127,127,127)
 white=(255,255,255)
-green=(140,160,140)
+green=(140,200,140)
 orange=(0,155,255)
 purple=(55,0,55)
 cyan=(155,155,0)
