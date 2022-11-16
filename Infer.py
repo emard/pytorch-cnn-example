@@ -4,21 +4,18 @@
 # [x] enter list of color images as path/file.jpg or path/file.png files
 #     each file will be segmented to grayscale path/file_seg.png file
 # [ ] cmdline option to specify model .pth file
+# [ ] read DPI from input image
 
 import os, sys
-from PIL import Image, ImageOps
+import time
 import cv2
+from PIL import Image, ImageOps
+import numpy
 import torch
 import torchvision.models.segmentation
 import torchvision.transforms as tf
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-import numpy
-import time
-
-# allow to load large images
-Image.MAX_IMAGE_PIXELS = None
-
 SavedModelsFolder = "generated/saved_models"
 ListModels=os.listdir(SavedModelsFolder)
 # use torch.load with map_location=torch.device('cpu')
@@ -27,8 +24,7 @@ modelPath = os.path.join(SavedModelsFolder, ListModels[-1]) # latest model
 print("trained model:", modelPath)
 
 height=width=900 # should match training
-#transformImg = tf.Compose([tf.Resize((height, width)),tf.ToTensor(),tf.Normalize((0.35, 0.35, 0.35),(0.18, 0.18, 0.18))])
-transformImg = tf.Compose([tf.ToTensor(),tf.Normalize((0.35, 0.35, 0.35),(0.18, 0.18, 0.18))])
+transformImg = tf.Compose([tf.ToPILImage(), tf.Resize((height, width)), tf.ToTensor(),tf.Normalize((0.35, 0.35, 0.35),(0.18, 0.18, 0.18))])  # tf.Resize((300,600)),tf.RandomRotation(145)])#
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')  # Check if there is GPU if not set trainning to CPU (very slow)
 #Net = torchvision.models.segmentation.deeplabv3_mobilenet_v3_large()
@@ -38,6 +34,10 @@ Net.classifier[4] = torch.nn.Conv2d(256, 3, kernel_size=(1, 1), stride=(1, 1))  
 Net = Net.to(device)  # Set net to GPU or CPU
 Net.load_state_dict(torch.load(modelPath,map_location=torch.device(device))) # Load trained model
 Net.eval() # Set to evaluation mode
+
+# recolor converts indexes 0,1,2 to 8-bit grayscales [0,1,2] -> [0,127,255]
+recolor = numpy.array([0,127,255], dtype=numpy.uint8)
+torch2pil = tf.ToPILImage()
 
 def read_dpi(pilimg):
   if "dpi" in pilimg.info:
@@ -53,15 +53,12 @@ def read_dpi(pilimg):
 
 def semantic_segmentation(in_file, out_file):
   save_event = time.time()
-  in_img = Image.open(in_file)
-  out_img=Image.new(mode='L', size=in_img.size)   # mode='L' creates 8-bit grayscale image
-  width_orgin, height_orgin = in_img.size
-  print("info", in_img.info)
-  in_dpi = read_dpi(in_img)
-  print("dpi:", in_dpi)
-  torch2pil = tf.ToPILImage()
-  # recolor converts indexes 0,1,2 to 8-bit grayscales [0,1,2] -> [0,127,255]
-  recolor = numpy.array([0,127,255], dtype=numpy.uint8)
+  in_img = cv2.imread(in_file) # load input image
+  in_dpi=read_dpi(Image.open(in_file)) # read DPI from in_file using PIL
+  height_orgin, width_orgin, d = in_img.shape # Get image original size 
+  out_img=Image.new(mode='L', size=(width_orgin, height_orgin))   # mode='L' creates 8-bit grayscale image
+  #plt.imshow(Img[:,:,::-1])  # Show image
+  #plt.show()
 
   # for each tile from in_img, apply transform, semantic segmentation and paste to output image
   xclamp = width_orgin-width
@@ -76,22 +73,22 @@ def semantic_segmentation(in_file, out_file):
       if x > xclamp: x = xclamp
       #print(x,end=" ")
       print("tile from origin", x,y)
-      tile = in_img.crop((x,y,x+width,y+height))
+      Img = in_img[y:y+height,x:x+width] #  in_img.crop((x,y,x+width,y+height))
 
-      # semantic segmentation of the tile
-      Img = transformImg(tile)
+      Img = transformImg(Img)  # Transform to pytorch
       mean, std = Img.mean([1,2]), Img.std([1,2])
-      # print statistics, if most images deviate too much,
-      # change tf.Normalize. They must be same here in Infer.py and in Train.py
+      # print statistics, if most images deviates too much,
+      # change tf.Normalize. They must be same here in Infer.py
+      # and in Train.py
       print("mean (ideal = 0,0,0) : ", mean);
       print("std  (ideal = 1,1,1) : ", std);
+
       Img = torch.autograd.Variable(Img, requires_grad=False).to(device).unsqueeze(0)
       with torch.no_grad():
         Prd = Net(Img)['out']  # Run net
       # Prd = tf.Resize((height_orgin, width_orgin))(Prd[0]) # Resize to origninal size
-      Prd = Prd[0] # don't resize, just take out the basic result
-      seg = torch.argmax(Prd, 0).cpu().detach().numpy().astype(numpy.uint8) # Get prediction classes
-      # color convert and paste result tile to same origin in out_img
+      Prd = Prd[0] # take out the basic result
+      seg = torch.argmax(Prd, 0).cpu().detach().numpy()  # Get prediction classes
       out_img.paste(torch2pil(recolor[seg]), (x,y)) # (x,y) is origin coordinate to paste at
       # save partial result every minute
       if time.time() > save_event:
@@ -101,6 +98,9 @@ def semantic_segmentation(in_file, out_file):
       x += width
     y += height
 
+  #plt.imshow(seg)  # display image
+  #plt.show()
+  #cv2.imwrite(resultPath, seg*127) # HACK: writes grayscale image with 3 "colors" [0,1,2] -> [0,127,254]
   # save final image to file
   out_img.save(out_file, dpi=in_dpi)
 
