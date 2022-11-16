@@ -10,10 +10,10 @@ if 1:
   dpi=100
 
   # how many voids and stones per image
-  void_count=500
+  void_count=1000
   # poisson distribution
   void_lambda=5
-  void_size=3
+  void_size=1
 
   stone_count=200
   # poisson distribution
