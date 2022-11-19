@@ -27,7 +27,13 @@ ListModels=os.listdir(SavedModelsFolder)
 modelPath = os.path.join(SavedModelsFolder, ListModels[-1]) # latest model
 print("trained model:", modelPath)
 
-height=width=900 # should match training
+height=width=900 # tile size, should match training
+
+# tiles overlap margin size in pixels
+# inner tiles will be cropped at each edge by this pixel amount
+# to get rid of boundary conditions at tile edges
+overlap = 16 # pixels from each edge (0 to disable)
+
 transformImg = tf.Compose([tf.ToPILImage(), tf.Resize((height, width)), tf.ToTensor(),tf.Normalize((0.35, 0.35, 0.35),(0.18, 0.18, 0.18))])  # tf.Resize((300,600)),tf.RandomRotation(145)])#
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')  # Check if there is GPU if not set trainning to CPU (very slow)
@@ -68,13 +74,15 @@ def semantic_segmentation(in_file, out_file):
   xclamp = width_orgin-width
   yclamp = height_orgin-height
   y = 0
-  while y < height_orgin:
-    if y > yclamp: y = yclamp
+  yrun = 1
+  while yrun:
+    if y > yclamp: y = yclamp; yrun = 0
     #print()
     #print("y=",y,"x=",end="")
     x = 0
-    while x < width_orgin:
-      if x > xclamp: x = xclamp
+    xrun = 1
+    while xrun:
+      if x > xclamp: x = xclamp; xrun = 0
       #print(x,end=" ")
       print("tile from origin", x,y)
       Img = in_img[y:y+height,x:x+width] #  in_img.crop((x,y,x+width,y+height))
@@ -93,14 +101,17 @@ def semantic_segmentation(in_file, out_file):
       # Prd = tf.Resize((height_orgin, width_orgin))(Prd[0]) # Resize to origninal size
       Prd = Prd[0] # take out the basic result
       seg = torch.argmax(Prd, 0).cpu().detach().numpy()  # Get prediction classes
-      out_img.paste(torch2pil(recolor[seg]), (x,y)) # (x,y) is origin coordinate to paste at
+      xcrop=ycrop=0
+      if x > 0: xcrop=overlap
+      if y > 0: ycrop=overlap
+      out_img.paste(torch2pil(recolor[seg[ycrop:,xcrop:]]), (x+xcrop,y+ycrop)) # (x+xcrop,y+ycrop) is origin coordinate to paste at
       # save partial result every minute
       if time.time() > save_event:
         save_event = time.time() + 60
         out_img.save(out_file, dpi=in_dpi)
         print("saved", out_file)
-      x += width
-    y += height
+      x += width-2*overlap
+    y += height-2*overlap
 
   #plt.imshow(seg)  # display image
   #plt.show()
