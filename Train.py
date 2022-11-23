@@ -36,10 +36,10 @@ def display2img(color, result):
 # tf.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
 # with random crop_x crop_y, tf.Resize is not needed
 # if sizes of all images are larger or equal than width,height
-transformImg=(tf.Compose([tf.ToPILImage(),                                        tf.Resize((height,width)),tf.ToTensor(),tf.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.07, hue=0.05),tf.Normalize((0.35, 0.35, 0.35), (0.18, 0.18, 0.18))]),
-              tf.Compose([tf.ToPILImage(),tf.functional.hflip,                    tf.Resize((height,width)),tf.ToTensor(),tf.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.07, hue=0.05),tf.Normalize((0.35, 0.35, 0.35), (0.18, 0.18, 0.18))]),
-              tf.Compose([tf.ToPILImage(),tf.functional.vflip,                    tf.Resize((height,width)),tf.ToTensor(),tf.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.07, hue=0.05),tf.Normalize((0.35, 0.35, 0.35), (0.18, 0.18, 0.18))]),
-              tf.Compose([tf.ToPILImage(),tf.functional.hflip,tf.functional.vflip,tf.Resize((height,width)),tf.ToTensor(),tf.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.07, hue=0.05),tf.Normalize((0.35, 0.35, 0.35), (0.18, 0.18, 0.18))]),
+transformImg=(tf.Compose([tf.ToPILImage(),                                        tf.Resize((height,width)),tf.ToTensor(),tf.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.1),tf.Normalize((0.35, 0.35, 0.35), (0.18, 0.18, 0.18))]),
+              tf.Compose([tf.ToPILImage(),tf.functional.hflip,                    tf.Resize((height,width)),tf.ToTensor(),tf.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.1),tf.Normalize((0.35, 0.35, 0.35), (0.18, 0.18, 0.18))]),
+              tf.Compose([tf.ToPILImage(),tf.functional.vflip,                    tf.Resize((height,width)),tf.ToTensor(),tf.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.1),tf.Normalize((0.35, 0.35, 0.35), (0.18, 0.18, 0.18))]),
+              tf.Compose([tf.ToPILImage(),tf.functional.hflip,tf.functional.vflip,tf.Resize((height,width)),tf.ToTensor(),tf.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.1),tf.Normalize((0.35, 0.35, 0.35), (0.18, 0.18, 0.18))]),
               )
 transformAnn=(tf.Compose([tf.ToPILImage(),                                        tf.Resize((height,width),tf.InterpolationMode.NEAREST),tf.ToTensor()]),
               tf.Compose([tf.ToPILImage(),tf.functional.hflip,                    tf.Resize((height,width),tf.InterpolationMode.NEAREST),tf.ToTensor()]),
