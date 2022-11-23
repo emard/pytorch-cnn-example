@@ -104,14 +104,14 @@ def generate(i):
   # image generated, write
   #cv2.imwrite("generated/Image/image%03d.jpg" % i, image)
   image_pil = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-  image_pil.save("generated/Image/image%03d.jpg" % i, dpi=(dpi,dpi))
+  image_pil.save("train/Image/image%03d.jpg" % i, dpi=(dpi,dpi))
 
   # generate type 1 (stone) annotated image
   image = np.zeros((height,width,3), np.uint8)
   circles(xpstone,ypstone,rstone,white) # draw stones
   # semantic for stones generated, write
   image_pil = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2GRAY))
-  image_pil.save("generated/Semantic/1_stone/image%03d.png" % i, dpi=(dpi,dpi))
+  image_pil.save("train/Semantic/1_stone/image%03d.png" % i, dpi=(dpi,dpi))
 
   # generate type 2 (void) annotated image
   image = np.zeros((height,width,3), np.uint8)
@@ -119,7 +119,7 @@ def generate(i):
   circles(xpstone,ypstone,rstone,black) # erase stones
   # semantic for voids generated, write
   image_pil = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2GRAY))
-  image_pil.save("generated/Semantic/2_void/image%03d.png" % i, dpi=(dpi,dpi))
+  image_pil.save("train/Semantic/2_void/image%03d.png" % i, dpi=(dpi,dpi))
 
   # generate ideally segmented image (to compare with output of Infer.py)
   image = np.zeros((height,width,3), np.uint8)
@@ -127,7 +127,7 @@ def generate(i):
   circles(xpstone,ypstone,rstone,gray) # gray stones
   # ideally segmented image, write
   image_pil = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2GRAY))
-  image_pil.save("generated/Segmented/image%03d.png" % i, dpi=(dpi,dpi))
+  image_pil.save("train/Segmented/image%03d.png" % i, dpi=(dpi,dpi))
 
 for i in range(count):
   generate(i)

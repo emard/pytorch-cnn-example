@@ -23,10 +23,10 @@ import time
 # allow to load large images
 Image.MAX_IMAGE_PIXELS = None
 
-SavedModelsFolder = "generated/saved_models"
+SavedModelsFolder = "train/saved_models"
 ListModels=os.listdir(SavedModelsFolder)
 # use torch.load with map_location=torch.device('cpu')
-#modelPath = "generated/saved_models/760.pth"  # Path to trained model
+#modelPath = "train/saved_models/760.pth"  # Path to trained model
 modelPath = os.path.join(SavedModelsFolder, ListModels[-1]) # latest model
 print("trained model:", modelPath)
 
@@ -126,7 +126,7 @@ input_file_list = sys.argv[1:]
 for imagePath in input_file_list:
   print("input  :", imagePath)
   ip_base, ip_ext = os.path.splitext(imagePath)
-  resultPath = ip_base + "_seg.png" # file name of result segmented image
+  resultPath = ip_base + "-seg.png" # file name of result segmented image
   semantic_segmentation(imagePath, resultPath)
   print("output :", resultPath)
 

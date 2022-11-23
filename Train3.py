@@ -18,7 +18,7 @@ width=height=896 # image width and height, minimum 224 pixels
 batchSize=4
 save_every=200
 
-TrainFolder="generated"
+TrainFolder="train"
 
 SavedModelFolder=os.path.join(TrainFolder,"saved_models")
 ListImages=os.listdir(os.path.join(TrainFolder, "Image")) # Create list of images
