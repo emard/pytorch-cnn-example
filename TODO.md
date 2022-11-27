@@ -8,7 +8,6 @@
     [x] margin few pixels tile overlap to avoid boundary conditions
     [x] improve code to erase previous file
     [ ] separate random filp transform
-    [ ] after each save re-load file list, so that
-        user can add files while train.py runs
+    [x] after each save re-load file list
     [ ] script or python support for flat train set in single directory
         *0.* is original image, *1.png and *2.png are its semantic annotations
