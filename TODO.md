@@ -10,3 +10,5 @@
     [ ] separate random filp transform
     [ ] after each save re-load file list, so that
         user can add files while train.py runs
+    [ ] script or python support for flat train set in single directory
+        *0.* is original image, *1.png and *2.png are its semantic annotations
