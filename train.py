@@ -9,7 +9,7 @@ import torchvision.transforms as tf
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-Learning_Rate=1e-5
+Learning_Rate=2e-6 # too large: oscillates, too small: slow convergence
 width=height=900 # image width and height, minimum 224 pixels
 batchSize=4
 save_every=200
@@ -17,8 +17,12 @@ save_every=200
 TrainFolder="train"
 
 SavedModelFolder=os.path.join(TrainFolder,"saved_models")
-ListImages=os.listdir(os.path.join(TrainFolder, "Image")) # Create list of images
-#print(ListImages)
+ListImages=[]
+def updateListImages():
+  global ListImages
+  ListImages=os.listdir(os.path.join(TrainFolder, "Image")) # Create list of images
+updateListImages()
+print(len(ListImages), "images")
 # display 2 images side-by-side
 def display2img(color, result):
   #color = mpimg.imread(path1)
@@ -142,5 +146,6 @@ while itr*batchSize < 40000: # Training loop
    if time.time() > save_event:
       save_event = time.time() + 60
       save_trained_model(itr)
+      updateListImages()
    itr += 1
 save_trained_model(itr)
