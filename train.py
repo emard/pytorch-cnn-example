@@ -9,7 +9,7 @@ import torchvision.transforms as tf
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-Learning_Rate=2e-6 # too large: oscillates, too small: slow convergence
+Learning_Rate=1e-5 # too large: oscillates, too small: slow convergence
 width=height=900 # image width and height, minimum 224 pixels
 batchSize=4
 save_every=200
@@ -112,7 +112,8 @@ def save_trained_model(itr):
 #--------------Load and set net and optimizer-------------------------------------
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 #Net = torchvision.models.segmentation.deeplabv3_mobilenet_v3_large()
-Net = torchvision.models.segmentation.deeplabv3_resnet50(weights=torchvision.models.segmentation.DeepLabV3_ResNet50_Weights.DEFAULT) # Load net
+#Net = torchvision.models.segmentation.deeplabv3_resnet50(weights=torchvision.models.segmentation.DeepLabV3_ResNet50_Weights.DEFAULT) # Load net
+Net = torchvision.models.segmentation.deeplabv3_resnet50(weights=None) # Load net
 #Net = torchvision.models.segmentation.deeplabv3_resnet101()
 Net.classifier[4] = torch.nn.Conv2d(256, 3, kernel_size=(1, 1), stride=(1, 1)) # Change final layer to 3 classes
 Net=Net.to(device)
