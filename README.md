@@ -22,21 +22,61 @@ Use script "tools/split-image.sh bigimage.jpg". Split tiles will be in
 
 Choose tile of interested and open it with gimp. Create 3 additional layers:
 "black", "red", "green". Create "red" and "green" filled with transparent
-background, "black" filled with non-transparent black (background). Black is
-required. If black layer is missing, otherwise a "bug" will appear.
+background, "black" filled with non-transparent black (background).
+
+On the left window in the middle, find two overlapping squares and
+click lower right square, then select full black (0,0,0) as background
+color.
+
+Right-click on lower right vertical window (layers), a pop-up
+menu will appear.
+
+Click on "New Layer", a "Create New Layer" window will appear.
+
+Create New Layer, select:
+
+    Layer name:  1_stone
+    Color tag:   red
+    Fill with:   Transparency
+
+Create New Layer, select:
+
+    Layer name:  2_void
+    Color tag:   green
+    Fill with:   Transparency
+
+Create New Layer, select:
+
+    Layer name:  0_black
+    Color tag:   black
+    Fill with:   Background color
+
+Black is required. If black layer is missing, otherwise a "bug" will appear.
 Pixels erased with "rubber" tools will look transparent (invisible) to user
 but they will be exported as gray instead of black.
 
-Layers should be ordered like this:
+Layers should be ordered like this (drag with mouse up-down):
 
     enable  color  name     background
     ------  -----  ----     ----------
     [x]     green  1_stone  transparent
     [x]     red    2_void   transparent
     [x]            image to be annotated
-    [x]     black  0        black
+    [x]     black  0_black  black
 
-Use tools: sharp pencil, rubber, fill.
+If already annotated image is available as .png file
+preferrable with transparency, it can be imported
+as new layer from menu "File" -> "Open as Layers" and
+select file name and click "Open".
+
+If there's no transparency in .png file then after
+importing as layer, transparency can be created with:
+
+    "Colors" -> "Color to Alpha"
+
+"Colors" menu has many options to convert colors.
+
+To manually annotate, use tools: sharp pencil, rubber, fill.
 Create 100% green (0,255,0) and 100% red color (255,0,0)
 and add those colors to palette for quick selection while working.
 Select layer 1 or 2, select pencil color from palette
@@ -49,7 +89,7 @@ When finished, select "green" and "black"
     [x]     green  1_stone  transparent
     [ ]     red    2_void   transparent
     [ ]            image to be annotated
-    [x]     black  0        black
+    [x]     black  0_black  black
 
 and export it as 8-bit GRAY .png file to
 directory "generated/Semantic/1_stone".
@@ -61,7 +101,7 @@ Similar select "red" and "black"
     [ ]     green  1_stone  transparent
     [x]     red    2_void   transparent
     [ ]            image to be annotated
-    [x]     black  0        black
+    [x]     black  0_black  black
 
 and export it as 8-bit GRAY .png file to
 directory "generated/Semantic/2_void".
@@ -78,7 +118,7 @@ Original image should be copied or similarly selected and exported
     [ ]     green  1_stone  transparent
     [ ]     red    2_void   transparent
     [x]            image to be annotated
-    [x]     black  0        black
+    [x]     black  0_black  black
 
 to directory "generated/Image".
 
@@ -105,7 +145,7 @@ Run, check if no errors, and let it work. Script will save .pth file
 every 50 iterations. Script can be stopped and started, it will resume
 from saved file.
 
-    ./Train
+    ./train.sh
 
 # Infer
 
@@ -114,7 +154,7 @@ at least one color image of approx 900x900 should be prepared.
 Tool internally resizes the input image so some smaller or larger
 could be used.
 
-Given one "image.png" or "image.jpg" as paramter "Infer.py" script will
+Given one "image.png" or "image.jpg" as paramter "infer.sh" script will
 apply trained coefficients, write segmented grayscale image "image_seg.png"
 with 3 possible pixel values:
 
@@ -125,18 +165,18 @@ with 3 possible pixel values:
 and display on screen source image
 and segmented one.
 
-     ./Infer.py input.jpg
+     ./infer.sh input.jpg
 
 If 2 or more image files as arguments are passed, script will batch-process all
 of them and won't display any.
 
-     ./Infer.py tile*.png
+     ./infer.sh tile*.png
 
 To properly segment large image, it should be split to 900x900 tiles,
 each tile segmented and results joined back into one large image.
 There is automated script for this:
 
-     tools/infer.sh inpup.jpg
+     tools/infer.sh input.jpg
      ...
      scale written to /tmp/airvoid/full_seg.png
 
@@ -147,7 +187,7 @@ wouldn't make full 900x900 tiles.
 There are scripts to do this:
 
      tools/split-tiles.sh image.jpg
-     ./Infer.py /tmp/airvoid/tile*.png
+     ./infer.sh /tmp/airvoid/tile*.png
      tools/join-tiles.sh
      tools/set-scale.sh /tmp/full_seg.png
 
