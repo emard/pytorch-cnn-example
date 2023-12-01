@@ -1,3 +1,3 @@
-#!/bin/bash
-source torch/bin/activate
-exec ./infer.py $*
+#!/bin/sh
+. torch/bin/activate
+exec nice -n +20 ./infer.py $*
