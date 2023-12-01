@@ -12,6 +12,6 @@
 cd /tmp
 # cd ~/doc/css/beton/udio-pora-ocvrsli-beton/pytorch-cnn-example
 python3 -m virtualenv torch
-source torch/bin/activate
+. torch/bin/activate
 # (torch) davor@nuc1:/tmp$
 pip install torch torchvision matplotlib opencv-python
