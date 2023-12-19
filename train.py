@@ -9,7 +9,7 @@ import torchvision.transforms as tf
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-Learning_Rate=1e-5 # too large: oscillates, too small: slow convergence
+Learning_Rate=5e-6 # too large: oscillates, too small: slow convergence
 width=height=900 # image width and height, minimum 224 pixels
 batchSize=4
 save_every=200
