@@ -11,3 +11,4 @@
     [x] after each save re-load file list
     [ ] script or python support for flat train set in single directory
         *0.* is original image, *1.png and *2.png are its semantic annotations
+    [ ] exiftool -overwrite_original_in_place -imageNumber=1234567890 /tmp/image.jpeg
